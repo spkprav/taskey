@@ -1,0 +1,67 @@
+<div id="main">
+  <div id="left">
+    <%= form_for(@group) do |f| %>
+      <%= f.text_field :name, placeholder: 'Enter Group Name' %>
+      <%= f.submit "Create Group", style: 'display:none;' %>
+    <% end %>
+    <ul>
+      <% @groups.each do |group| %>
+        <li><h6><a href="<%= root_url + 'selected/group/' + group.id.to_s %>" ><%= group.name %></a></h6></li>
+      <% end %>
+    </ul>
+  </div>
+  <div id="middle">
+    <div style='position:relative;'>
+      <%= form_for(@task) do |f| %>
+        <%= f.text_field :title, style: 'width: 100%;padding: 5px;', placeholder: 'Enter Task Title' %><br />
+        <%= f.text_area :description, style: 'width: 100%;', placeholder: 'Enter Task Description' %>
+        <%= f.hidden_field :group_id, value: session[:selected_group_id] %>
+        <%= f.submit "Create Task", class: 'btn btn-sm btn-success btn-create-task'%>
+      <% end %>
+    </div>
+    <ul>
+      <% @tasks.each do |task| %>
+        <li><h6><a href="<%= root_url + 'selected/task/' + task.id.to_s %>" ><%= task.title %></a></h6></li>
+      <% end %>
+    </ul>
+  </div>
+  <div id="right">
+    <div style='position:relative;'>
+      <%= form_for(@selected_task) do |f| %>
+        <%= f.hidden_field :group_id, value: session[:selected_group_id] %>
+        <div class="field">
+          <%= f.collection_select :user_id, User.all, :id, :email %>
+        </div>
+        <div class="field">
+          <%= f.check_box :completed %> <%= f.text_field :title %>
+        </div>
+        <div class="field">
+          <%= f.text_area :description %>
+        </div>
+        <%= f.submit 'Update', class: 'btn btn-sm btn-success btn-create-task', style: 'position:absolute;bottom:1px;right:1px;' %>
+      <% end %>
+    </div>
+    <ul id="comments_ul">
+      <% @selected_task.feeds.each do |feed| %>
+        <li>
+          <div style="margin-bottom:1px solid #eee;padding-bottom:2px;color:#666;">
+            <i><%= feed.user.email %></i> - <i><%= time_ago_in_words(feed.created_at) %> ago</i>
+          </div>
+          <div><%= simple_format(feed.description) %></div>
+          <hr />
+        </li>
+      <% end %>
+    </ul>
+    <div style="width:100%;position:relative;">
+      <%= form_for(@feed) do |f| %>
+        <%= f.hidden_field :task_id, value: session[:selected_task_id] %>
+        <%= f.hidden_field :type, value: 'comment' %>
+        <%= f.hidden_field :user_id, value: current_user.id %>
+        <div class="field">
+          <%= f.text_area :description, style: 'width:100%' %>
+        </div>
+        <%= f.submit 'Comment', class: 'btn btn-sm btn-success btn-create-task', style: 'position:absolute;bottom:1px;right:1px;' %>
+      <% end %>
+    </div>
+  </div>
+</div>

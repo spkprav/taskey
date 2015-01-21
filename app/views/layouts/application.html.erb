@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Taskey</title>
+  <%= stylesheet_link_tag 'application', media: 'all' %>
+  <%= javascript_include_tag 'application' %>
+  <%= csrf_meta_tags %>
+</head>
+<body>
+  <nav class="navbar navbar-inverse navbar-embossed" role="navigation">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse-01">
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+    </div>
+    <div class="collapse navbar-collapse" id="navbar-collapse-01">
+      <a class="navbar-brand" href="<%= root_url %>">Taskey</a>
+      <ul class="nav navbar-nav navbar-right">
+        <% if current_user.nil? %>
+        <li><a href="/user/login">Login</a></li>
+        <% end %>
+        <% unless current_user.nil? %>
+        <li><a href="/user/logout" data-method="delete" rel="nofollow"><i class="fui-exit"></i></a></li>
+        <% end %>
+      </ul>
+      <form class="navbar-form navbar-right" action="#" role="search">
+        <div class="form-group">
+          <div class="input-group">
+            <input class="form-control" id="navbarInput-01" type="search" placeholder="Search">
+            <span class="input-group-btn">
+              <button type="submit" class="btn"><span class="fui-search"></span></button>
+            </span>
+          </div>
+        </div>
+      </form>
+    </div><!-- /.navbar-collapse -->
+  </nav>
+  <% if notice != nil %>
+    <p class="notice"><%= notice %></p>
+  <% end %>
+  <% if alert != nil %>
+    <p class="alert"><%= alert %></p>
+  <% end %>
+  <%= yield %>
+</body>
+</html>
