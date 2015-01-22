@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+</head>
+<body>
+  <div style="margin-bottom:10px;">Hello, <%= @user.email %></div>
+  <div>@subject</div>
+  <div style="margin-bottom:10px;">
+    <a href="<%= root_url + 'from_mail/' + @task_id.to_s + '/' + @group_id.to_s %>">Click here to view the task</a>
+  </div>
+  <div>Thanks,</div>
+  <div>Tasky, Webpunditz</div>
+</body>
+</html>

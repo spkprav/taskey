@@ -20,5 +20,6 @@ Rails.application.routes.draw do
 
   get 'selected/group/:group_id', to: 'home#selected_group'
   get 'selected/task/:task_id', to: 'home#selected_task'
+  get 'from_mail/:task_id/:group_id', to: 'home#from_mail'
 
 end

@@ -23,7 +23,7 @@ class HomeController < ApplicationController
     else
       @selected_task = Task.includes(:feeds).find(session[:selected_task_id])
     end
-    
+
   end
 
   def selected_group
@@ -41,6 +41,12 @@ class HomeController < ApplicationController
     else
       session[:selected_task_id] = params[:task_id]
     end
+    redirect_to root_path
+  end
+
+  def from_mail
+    session[:selected_task_id] = params[:task_id]
+    session[:selected_group_id] = params[:group_id]
     redirect_to root_path
   end
 

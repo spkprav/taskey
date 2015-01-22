@@ -54,9 +54,13 @@ class TasksController < ApplicationController
       current_user: current_user
     }
     @task = Task.find(params[:id])
-
+    previous_user = @task.user_id
     respond_to do |format|
       if @task.update(pars)
+        updated_user = @task.user_id
+        if previous_user != updated_user && updated_user != nil
+          FeedMailer.assigned(@task.user.email,@task.description,@task.id,@task.group_id,current_user).deliver
+        end
         format.html { redirect_to root_url, notice: 'Task was successfully updated.' }
         format.json { render json: @task, status: :created, location: @post }
       else
