@@ -4,6 +4,7 @@ gem 'puma'
 gem 'mysql'
 gem 'devise'
 gem 'twitter-bootstrap-rails'
+gem 'best_in_place', '~> 3.0.1'
 # above are added
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'

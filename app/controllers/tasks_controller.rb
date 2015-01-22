@@ -26,14 +26,15 @@ class TasksController < ApplicationController
     pars = {
       title: params[:task][:title],
       description: params[:task][:description],
-      user_id: current_user.id,
       group_id: params[:task][:group_id],
-      completed: 0
+      completed: 0,
+      current_user: current_user
     }
     @task = Task.new(pars)
 
     respond_to do |format|
       if @task.save
+        session[:selected_task_id] = @task.id
         format.html { redirect_to root_url, notice: 'Task was successfully created.' }
         format.json { render json: @group, status: :created, location: @post }
       else
@@ -47,9 +48,10 @@ class TasksController < ApplicationController
     pars = {
       title: params[:task][:title],
       description: params[:task][:description],
-      user_id: current_user.id,
+      user_id: params[:task][:user_id],
       group_id: params[:task][:group_id],
-      completed: params[:task][:completed]
+      completed: params[:task][:completed],
+      current_user: current_user
     }
     @task = Task.find(params[:id])
 

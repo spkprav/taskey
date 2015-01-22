@@ -101,3 +101,36 @@
    padding: 10px;
    color: #ffffff;
  }
+ #left ul{
+   margin-top: 10px;
+ }
+ #left a{
+   width: 100%;
+   display:block;
+   padding:5px;
+ }
+ #left a:hover{
+   background: #CCCCCC;
+   color: #333333;
+ }
+ #left a:visited{
+   color: #333;
+ }
+ #left .selected, #middle .selected{
+   background: #AAA;
+   color: #333333;
+ }
+ #middle ul{
+   margin-top: 10px;
+ }
+ #middle ul li{
+   border-bottom: 1px solid #ccc;
+ }
+ #middle ul li a{
+   display: block;
+   padding: 10px 5px;
+ }
+ #middle ul li a:hover{
+   background: #ccc;
+   color: #333;
+ }

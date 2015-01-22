@@ -5,8 +5,9 @@
       <%= f.submit "Create Group", style: 'display:none;' %>
     <% end %>
     <ul>
+      <li><a href="<%= root_url %>?task=mytask" class="<%= (params[:task] == 'mytask')  ? 'selected' : '' %>">My Tasks</a></li>
       <% @groups.each do |group| %>
-        <li><h6><a href="<%= root_url + 'selected/group/' + group.id.to_s %>" ><%= group.name %></a></h6></li>
+        <li><a href="<%= root_url + 'selected/group/' + group.id.to_s %>" class="<%= (session[:selected_group_id] == group.id.to_s && params[:task] == nil) ? 'selected' : '' %>"><%= group.name %></a></li>
       <% end %>
     </ul>
   </div>
@@ -21,7 +22,9 @@
     </div>
     <ul>
       <% @tasks.each do |task| %>
-        <li><h6><a href="<%= root_url + 'selected/task/' + task.id.to_s %>" ><%= task.title %></a></h6></li>
+        <li>
+            <a href="<%= root_url + 'selected/task/' + task.id.to_s %>" class="<%= (session[:selected_task_id] == task.id.to_s) ? 'selected' : '' %>" ><%= task.title %></a>
+        </li>
       <% end %>
     </ul>
   </div>
@@ -30,7 +33,7 @@
       <%= form_for(@selected_task) do |f| %>
         <%= f.hidden_field :group_id, value: session[:selected_group_id] %>
         <div class="field">
-          <%= f.collection_select :user_id, User.all, :id, :email %>
+          <%= f.collection_select :user_id, User.all, :id, :email,{:include_blank => "Unassigned"} %>
         </div>
         <div class="field">
           <%= f.check_box :completed %> <%= f.text_field :title %>

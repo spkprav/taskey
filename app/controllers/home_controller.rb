@@ -7,16 +7,23 @@ class HomeController < ApplicationController
     @task = Task.new
     @feed = Feed.new
     @groups = Group.all
+
+    if params[:task] == 'mytask'
+      @tasks = Task.includes(:feeds).where(user_id: current_user.id)
+    else
+      if session[:selected_group_id] == nil
+        @tasks = Task.all
+      else
+        @tasks = Task.where(group_id: session[:selected_group_id])
+      end
+    end
+
     if session[:selected_task_id] == nil
       @selected_task = Task.new
     else
       @selected_task = Task.includes(:feeds).find(session[:selected_task_id])
     end
-    if session[:selected_group_id] == nil
-      @tasks = Task.all
-    else
-      @tasks = Task.where(group_id: session[:selected_group_id])
-    end
+    
   end
 
   def selected_group
