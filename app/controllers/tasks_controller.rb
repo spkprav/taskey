@@ -51,7 +51,8 @@ class TasksController < ApplicationController
       user_id: params[:task][:user_id],
       group_id: params[:task][:group_id],
       completed: params[:task][:completed],
-      current_user: current_user
+      current_user: current_user,
+      due_at: params[:task][:due_at]
     }
     @task = Task.find(params[:id])
     previous_user = @task.user_id
@@ -81,6 +82,6 @@ class TasksController < ApplicationController
     end
 
     def task_params
-      params.require(:task).permit(:title, :description, :completed, :group_id)
+      params.require(:task).permit(:title, :description, :completed, :group_id, :due_at)
     end
 end

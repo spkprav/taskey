@@ -38,7 +38,8 @@ class GroupsController < ApplicationController
 
   def update
     @group.update(group_params)
-    respond_with(@group)
+    redirect_to root_url
+    # respond_with(@group)
   end
 
   def destroy

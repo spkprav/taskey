@@ -2,7 +2,7 @@ class FeedsController < ApplicationController
   before_action :set_feed, only: [:show, :edit, :update, :destroy]
 
   before_action :authenticate_user!
-  
+
   respond_to :html
 
   def index
@@ -27,6 +27,9 @@ class FeedsController < ApplicationController
 
     respond_to do |format|
       if @feed.save
+        if params[:type] == 'comment' && @feed.task.user != nil
+          FeedMailer.comment(@feed.task.user.email,@feed.task.title,@feed.description,@feed.task.id,@feed.task.group_id,current_user,@feed.task.user).deliver
+        end
         format.html { redirect_to root_url, notice: 'Feed was successfully created.' }
       else
         format.html { redirect_to root_url }

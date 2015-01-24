@@ -6,22 +6,24 @@ class HomeController < ApplicationController
     @group = Group.new
     @task = Task.new
     @feed = Feed.new
-    @groups = Group.all
+    @groups = Group.includes(:tasks).all
+    @my_tasks = Task.where(user_id: current_user.id).count
 
     if params[:task] == 'mytask'
-      @tasks = Task.includes(:feeds).where(user_id: current_user.id)
+      @tasks = Task.includes(:user).where(user_id: current_user.id)
     else
       if session[:selected_group_id] == nil
-        @tasks = Task.all
+        @tasks = Task.includes(:user).where(user_id: current_user.id)
       else
-        @tasks = Task.where(group_id: session[:selected_group_id])
+        @group_update = Group.find(session[:selected_group_id])
+        @tasks = Task.includes(:user).where(group_id: session[:selected_group_id])
       end
     end
 
     if session[:selected_task_id] == nil
       @selected_task = Task.new
     else
-      @selected_task = Task.includes(:feeds).find(session[:selected_task_id])
+      @selected_task = Task.includes(:feeds,feeds:[:user]).find(session[:selected_task_id])
     end
 
   end

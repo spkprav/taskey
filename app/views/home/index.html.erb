@@ -5,25 +5,47 @@
       <%= f.submit "Create Group", style: 'display:none;' %>
     <% end %>
     <ul>
-      <li><a href="<%= root_url %>?task=mytask" class="<%= (params[:task] == 'mytask')  ? 'selected' : '' %>">My Tasks</a></li>
+      <li>
+        <a href="<%= root_url %>?task=mytask"
+          class="<%= (params[:task] == 'mytask')  ? 'selected' : '' %>">
+          My Tasks <span class="badge"><%= @my_tasks %></span>
+        </a>
+      </li>
       <% @groups.each do |group| %>
-        <li><a href="<%= root_url + 'selected/group/' + group.id.to_s %>" class="<%= (session[:selected_group_id] == group.id.to_s && params[:task] == nil) ? 'selected' : '' %>"><%= group.name %></a></li>
+        <li>
+          <a href="<%= root_url + 'selected/group/' + group.id.to_s %>"
+            class="<%= (session[:selected_group_id] == group.id.to_s && params[:task] == nil) ? 'selected' : '' %>">
+            <%= group.name %> <span class="badge"><%= group.tasks.count %></span>
+          </a>
+        </li>
       <% end %>
     </ul>
   </div>
   <div id="middle">
-    <div style='position:relative;'>
-      <%= form_for(@task) do |f| %>
-        <%= f.text_field :title, style: 'width: 100%;padding: 5px;', placeholder: 'Enter Task Title' %><br />
-        <%= f.text_area :description, style: 'width: 100%;', placeholder: 'Enter Task Description' %>
-        <%= f.hidden_field :group_id, value: session[:selected_group_id] %>
-        <%= f.submit "Create Task", class: 'btn btn-sm btn-success btn-create-task'%>
-      <% end %>
-    </div>
+    <!-- Add group status update and release due date -->
+    <% unless @group_update.nil? %>
+      <div style='position:relative;'>
+        <%= form_for(@group_update) do |f| %>
+          <%= f.text_area :description, style: 'width: 100%;', placeholder: 'Enter Update' %>
+          <%= f.hidden_field :group_id, value: session[:selected_group_id] %>
+          <%= f.submit "Update", class: 'btn btn-sm btn-success btn-create-task'%>
+        <% end %>
+      </div>
+    <% end %>
     <ul>
       <% @tasks.each do |task| %>
         <li>
-            <a href="<%= root_url + 'selected/task/' + task.id.to_s %>" class="<%= (session[:selected_task_id] == task.id.to_s) ? 'selected' : '' %>" ><%= task.title %></a>
+            <a href="<%= root_url + 'selected/task/' + task.id.to_s %>"
+              class="<%= (session[:selected_task_id] == task.id.to_s) ? 'selected' : '' %>" >
+              [<%= (task.user) ? task.user.name : "Unassigned" %>] <%= task.title %>
+              <% unless task.due_at.nil? %>
+                <% if task.due_at.past? %>
+                  <span class="label label-danger"><%= time_ago_in_words(task.due_at) %> ago</span>
+                <% elsif task.due_at.future? %>
+                  <span class="label label-success"><%= time_ago_in_words(task.due_at) %> from now</span>
+                <% end %>
+              <% end %>
+            </a>
         </li>
       <% end %>
     </ul>
@@ -32,16 +54,30 @@
     <div style='position:relative;'>
       <%= form_for(@selected_task) do |f| %>
         <%= f.hidden_field :group_id, value: session[:selected_group_id] %>
-        <div class="field">
-          <%= f.collection_select :user_id, User.all, :id, :email,{:include_blank => "Unassigned"} %>
+        <div class="field" id="assign_datetime">
+          <%= f.collection_select :user_id, User.all, :id, :name,{:include_blank => "Unassigned"} %>
+          <%= f.text_field :due_at, class: 'datetimepicker' %>
+        </div>
+        <div style="font-size: 16px;padding-bottom: 10px;">
+          <% unless @selected_task.due_at.nil? %>
+            <% if @selected_task.due_at.past? %>
+              Due date: <span class="label label-danger"><%= time_ago_in_words(@selected_task.due_at) %> ago</span>
+            <% elsif @selected_task.due_at.future? %>
+              Due date: <span class="label label-success"><%= time_ago_in_words(@selected_task.due_at) %> from now</span>
+            <% end %>
+          <% end %>
         </div>
         <div class="field">
-          <%= f.check_box :completed %> <%= f.text_field :title %>
+          <%= f.check_box :completed %> <%= f.text_field :title, placeholder: "Task title" %>
         </div>
         <div class="field">
-          <%= f.text_area :description %>
+          <%= f.text_area :description, placeholder: "Task Description" %>
         </div>
-        <%= f.submit 'Update', class: 'btn btn-sm btn-success btn-create-task', style: 'position:absolute;bottom:1px;right:1px;' %>
+        <% if @selected_task.id.nil? %>
+          <%= f.submit 'Create', class: 'btn btn-sm btn-success btn-create-task', style: 'position:absolute;bottom:1px;right:1px;' %>
+        <% else %>
+          <%= f.submit 'Update', class: 'btn btn-sm btn-success btn-create-task', style: 'position:absolute;bottom:1px;right:1px;' %>
+        <% end %>
       <% end %>
     </div>
     <ul id="comments_ul">
@@ -55,16 +91,18 @@
         </li>
       <% end %>
     </ul>
-    <div style="width:100%;position:relative;">
-      <%= form_for(@feed) do |f| %>
-        <%= f.hidden_field :task_id, value: session[:selected_task_id] %>
-        <%= f.hidden_field :type, value: 'comment' %>
-        <%= f.hidden_field :user_id, value: current_user.id %>
-        <div class="field">
-          <%= f.text_area :description, style: 'width:100%' %>
-        </div>
-        <%= f.submit 'Comment', class: 'btn btn-sm btn-success btn-create-task', style: 'position:absolute;bottom:1px;right:1px;' %>
-      <% end %>
-    </div>
+    <% unless @selected_task.id.nil? %>
+      <div style="width:100%;position:relative;">
+        <%= form_for(@feed) do |f| %>
+          <%= f.hidden_field :task_id, value: session[:selected_task_id] %>
+          <input type="hidden" name="type" value="comment" />
+          <%= f.hidden_field :user_id, value: current_user.id %>
+          <div class="field">
+            <%= f.text_area :description, style: 'width:100%' %>
+          </div>
+          <%= f.submit 'Comment', class: 'btn btn-sm btn-success btn-create-task', style: 'position:absolute;bottom:1px;right:1px;' %>
+        <% end %>
+      </div>
+    <% end %>
   </div>
 </div>
