@@ -52,32 +52,36 @@
   </div>
   <div id="right">
     <div style='position:relative;'>
-      <%= form_for(@selected_task) do |f| %>
-        <%= f.hidden_field :group_id, value: session[:selected_group_id] %>
-        <div class="field" id="assign_datetime">
-          <%= f.collection_select :user_id, User.all, :id, :name,{:include_blank => "Unassigned"} %>
-          <%= f.text_field :due_at, class: 'datetimepicker' %>
-        </div>
-        <div style="font-size: 16px;padding-bottom: 10px;">
-          <% unless @selected_task.due_at.nil? %>
-            <% if @selected_task.due_at.past? %>
-              Due date: <span class="label label-danger"><%= time_ago_in_words(@selected_task.due_at) %> ago</span>
-            <% elsif @selected_task.due_at.future? %>
-              Due date: <span class="label label-success"><%= time_ago_in_words(@selected_task.due_at) %> from now</span>
+      <% if session[:selected_group_id] != nil %>
+        <%= form_for(@selected_task) do |f| %>
+          <%= f.hidden_field :group_id, value: session[:selected_group_id] %>
+          <div class="field" id="assign_datetime">
+            <%= f.collection_select :user_id, User.all, :id, :name,{:include_blank => "Unassigned"} %>
+            <%= f.text_field :due_at, class: 'datetimepicker' %>
+          </div>
+          <div style="font-size: 16px;padding-bottom: 10px;">
+            <% unless @selected_task.due_at.nil? %>
+              <% if @selected_task.due_at.past? %>
+                Due date: <span class="label label-danger"><%= time_ago_in_words(@selected_task.due_at) %> ago</span>
+              <% elsif @selected_task.due_at.future? %>
+                Due date: <span class="label label-success"><%= time_ago_in_words(@selected_task.due_at) %> from now</span>
+              <% end %>
             <% end %>
+          </div>
+          <div class="field">
+            <%= f.check_box :completed %> <%= f.text_field :title, placeholder: "Task title" %>
+          </div>
+          <div class="field">
+            <%= f.text_area :description, placeholder: "Task Description" %>
+          </div>
+          <% if @selected_task.id.nil? %>
+            <%= f.submit 'Create', class: 'btn btn-sm btn-success btn-create-task', style: 'position:absolute;bottom:1px;right:1px;' %>
+          <% else %>
+            <%= f.submit 'Update', class: 'btn btn-sm btn-success btn-create-task', style: 'position:absolute;bottom:1px;right:1px;' %>
           <% end %>
-        </div>
-        <div class="field">
-          <%= f.check_box :completed %> <%= f.text_field :title, placeholder: "Task title" %>
-        </div>
-        <div class="field">
-          <%= f.text_area :description, placeholder: "Task Description" %>
-        </div>
-        <% if @selected_task.id.nil? %>
-          <%= f.submit 'Create', class: 'btn btn-sm btn-success btn-create-task', style: 'position:absolute;bottom:1px;right:1px;' %>
-        <% else %>
-          <%= f.submit 'Update', class: 'btn btn-sm btn-success btn-create-task', style: 'position:absolute;bottom:1px;right:1px;' %>
         <% end %>
+      <% else %>
+        <h6>Choose a group to create a task!</h6>
       <% end %>
     </div>
     <ul id="comments_ul">
