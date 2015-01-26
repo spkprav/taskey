@@ -21,4 +21,6 @@ $('document').ready(function(){
     startDate: new Date(),
     format:'Y-m-d H:i:s'
   });
+  // Checkboxes and Radio buttons
+  $('[data-toggle="checkbox"]').radiocheck();
 });

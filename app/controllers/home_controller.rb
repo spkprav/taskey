@@ -6,6 +6,7 @@ class HomeController < ApplicationController
     @group = Group.new
     @task = Task.new
     @feed = Feed.new
+    @uncategorized = Task.where(group_id: nil).count
     @groups = Group.includes(:tasks).all
     @my_tasks = Task.where(user_id: current_user.id).count
 
@@ -15,8 +16,13 @@ class HomeController < ApplicationController
       if session[:selected_group_id] == nil
         @tasks = Task.includes(:user).where(user_id: current_user.id)
       else
-        @group_update = Group.find(session[:selected_group_id])
-        @tasks = Task.includes(:user).where(group_id: session[:selected_group_id])
+        if session[:selected_group_id] != 'nil'
+          @group_update = Group.find(session[:selected_group_id])
+          @tasks = Task.includes(:user).where(group_id: session[:selected_group_id])
+        else
+          @group_update = nil
+          @tasks = Task.includes(:user).where(group_id: 0)
+        end
       end
     end
 

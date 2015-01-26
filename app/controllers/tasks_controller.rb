@@ -23,18 +23,35 @@ class TasksController < ApplicationController
   end
 
   def create
-    pars = {
-      title: params[:task][:title],
-      description: params[:task][:description],
-      group_id: params[:task][:group_id],
-      completed: 0,
-      current_user: current_user
-    }
+    if params[:task][:group_id].nil?
+      pars = {
+        title: params[:task][:title],
+        description: params[:task][:description],
+        completed: params[:task][:completed],
+        current_user: current_user,
+        due_at: params[:task][:due_at],
+        user_id: (params[:task][:user_id]) ? params[:task][:user_id] : nil
+      }
+    else
+      pars = {
+        title: params[:task][:title],
+        description: params[:task][:description],
+        group_id: params[:task][:group_id],
+        completed: params[:task][:completed],
+        current_user: current_user,
+        due_at: params[:task][:due_at],
+        user_id: (params[:task][:user_id]) ? params[:task][:user_id] : nil
+      }
+    end
+
     @task = Task.new(pars)
 
     respond_to do |format|
       if @task.save
         session[:selected_task_id] = @task.id
+        unless @task.user_id.nil?
+          FeedMailer.assigned(@task.user.email,@task.description,@task.id,@task.group_id,current_user).deliver
+        end
         format.html { redirect_to root_url, notice: 'Task was successfully created.' }
         format.json { render json: @group, status: :created, location: @post }
       else

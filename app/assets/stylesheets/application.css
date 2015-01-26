@@ -57,12 +57,12 @@
    bottom:0;
    overflow-x: scroll;
  }
- #right #task_user_id{
+ #right #task_user_id,#assign_datetime #task_user_id{
    width: 50%;
    padding: 3px;
    float: left;
  }
- #right #task_due_at {
+ #right #task_due_at, #assign_datetime #task_due_at{
    width: 50%;
    padding: 3px;
  }
@@ -72,6 +72,7 @@
  #task_title{
    width: 95%;
    padding: 5px;
+   margin-left: 30px;
  }
  #task_description{
    width: 100%;
@@ -140,4 +141,10 @@
  #middle ul li a:hover{
    background: #ccc;
    color: #333;
+ }
+ .checkbox .icons, .radio .icons{
+   width: 30px;
+   height: 30px;
+   font-size: 30px;
+   line-height: 30px;
  }
