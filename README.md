@@ -38,5 +38,3 @@ Thank you to all the contributors on this project. Your help is much appreciated
 Please fork this repository and contribute back using pull request.
 
 Any contributions, large or small, major features, bug fixes, additional language translations, unit/integration tests are welcomed and appreciated but will be thoroughly reviewed and discussed.
-
-I hope this helps you in building your next android app.
