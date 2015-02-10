@@ -34,6 +34,32 @@ class HomeController < ApplicationController
 
   end
 
+  def new_index
+    session[:return_to] = request.fullpath
+    @new_group = Group.new
+    @new_task = Task.new
+
+    if params[:workspace_id].nil?
+      @custom_workspace = true
+      params[:workspace_id] = "1"
+    end
+    @workspace_groups = Group.where(workspace_id: params[:workspace_id]).all
+
+    if params[:user_id].nil?
+      @group_tasks = Task.joins(:group).where('tasks.user_id = ? AND tasks.completed = ?',current_user.id,false)
+    elsif params[:user_id] != nil && params[:workspace_id].nil? && params[:group_id].nil? && params[:task_id].nil? && @custom_workspace == true
+      @group_tasks = Task.joins(:group).where('tasks.user_id = ? AND tasks.completed = ?',current_user.id,false)
+    elsif params[:user_id] != nil && params[:workspace_id] != nil && params[:group_id].nil? && params[:task_id].nil?
+      @group_tasks = Task.joins(:group).includes(:group).where('groups.workspace_id = ? AND tasks.completed = ?',params[:workspace_id],false).where('tasks.user_id = ?',current_user.id)
+    elsif params[:user_id] != nil && params[:workspace_id] != nil && params[:group_id] != nil && params[:task_id].nil?
+      @group_tasks = Task.joins(:group).includes(:group).where('groups.workspace_id = ? AND groups.id = ? AND tasks.completed = ?',params[:workspace_id], params[:group_id],false)
+    elsif params[:user_id] != nil && params[:workspace_id] != nil && params[:group_id] != nil && params[:task_id] != nil
+      @group_tasks = Task.joins(:group).includes(:group,:feeds).where('groups.workspace_id = ? AND groups.id = ? AND tasks.completed = ?',params[:workspace_id], params[:group_id],false)
+      @selected_task = Task.includes(:feeds).find(params[:task_id])
+      @new_feed = Feed.new
+    end
+  end
+
   def selected_group
     if session[:selected_group_id] == nil
       session[:selected_group_id] ||= params[:group_id]

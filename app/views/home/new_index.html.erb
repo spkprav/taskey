@@ -1,0 +1,154 @@
+<div id="main">
+  <div id="left">
+    <%= select_tag :workspace_id, options_from_collection_for_select(Workspace.all, :id, :title,params[:workspace_id]) %>
+    <%= form_for(@new_group) do |f| %>
+      <input type="hidden" name="worksoace_id" value="<%= params[:workspace_id] %>" />
+      <%= f.text_field :name, placeholder: 'Create New Group' %>
+      <%= f.submit "Create Group", style: 'display:none;' %>
+    <% end %>
+    <ul>
+      <% @workspace_groups.each do |group| %>
+        <li>
+          <a href="<%= root_url + current_user.id.to_s + '/' + params[:workspace_id] + '/' + group.id.to_s %>"
+            class="<%= (session[:selected_group_id] == group.id.to_s && params[:task] == nil) ? 'selected' : '' %>">
+            <%= group.name %> <span class="badge"><%= group.tasks.count %></span>
+          </a>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+  <div id="middle">
+    <!-- Add group status update and release due date -->
+    <% unless @group_status_update.nil? %>
+      <div style='position:relative;'>
+        <%= form_for(@group_status_update) do |f| %>
+        <%= f.text_area :description, style: 'width: 100%;', placeholder: 'Enter Update' %>
+        <%= f.hidden_field :group_id, value: session[:selected_group_id] %>
+        <%= f.submit "Update", class: 'btn btn-sm btn-success btn-create-task'%>
+        <% end %>
+      </div>
+    <% end %>
+    <ul>
+      <% @group_tasks.each do |task| %>
+        <li>
+          <a href="<%= root_url + current_user.id.to_s + '/' + task.group.workspace_id.to_s + '/' + task.group.id.to_s + '/' + task.id.to_s %>"
+            class="<%= (session[:selected_task_id] == task.id.to_s) ? 'selected' : '' %>" >
+            [<%= (task.user) ? task.user.name : "Unassigned" %>] <%= task.title %>
+            <% unless task.due_at.nil? %>
+            <% if task.due_at.past? %>
+            <span class="label label-danger"><%= time_ago_in_words(task.due_at) %> ago</span>
+            <% elsif task.due_at.future? %>
+            <span class="label label-success"><%= time_ago_in_words(task.due_at) %> from now</span>
+            <% end %>
+            <% end %>
+          </a>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+  <div id="right">
+    <% if @selected_task != nil %>
+      <div style='position:relative;'>
+        <%= form_for(@selected_task) do |f| %>
+          <div class="field" id="assign_datetime">
+            <%= f.collection_select :user_id, User.all, :id, :name,{:include_blank => "Unassigned"} %>
+            <%= f.text_field :due_at, class: 'datetimepicker' %>
+          </div>
+          <div style="font-size: 16px;padding-bottom: 10px;">
+            <% unless @selected_task.due_at.nil? %>
+              <% if @selected_task.due_at.past? %>
+                Due date: <span class="label label-danger"><%= time_ago_in_words(@selected_task.due_at) %> ago</span>
+              <% elsif @selected_task.due_at.future? %>
+                Due date: <span class="label label-success"><%= time_ago_in_words(@selected_task.due_at) %> from now</span>
+              <% end %>
+            <% end %>
+          </div>
+          <div class="field">
+            <label class="checkbox" for="task_completed">
+              <%= f.check_box :completed, 'data-toggle' => 'checkbox' %>
+            </label>
+            <%= f.text_field :title, placeholder: "Task title" %>
+          </div>
+          <div class="field">
+            <%= f.text_area :description, placeholder: "Task Description" %>
+          </div>
+          <% if @selected_task.id.nil? %>
+            <%= f.submit 'Create', class: 'btn btn-sm btn-success btn-create-task', style: 'position:absolute;bottom:1px;right:1px;' %>
+          <% else %>
+            <%= f.submit 'Update', class: 'btn btn-sm btn-success btn-create-task', style: 'position:absolute;bottom:1px;right:1px;' %>
+          <% end %>
+        <% end %>
+      </div>
+      <ul id="comments_ul">
+        <% @selected_task.feeds.each do |feed| %>
+        <li>
+          <div style="margin-bottom:1px solid #eee;padding-bottom:2px;color:#666;">
+            <i><%= feed.user.email %></i> - <i><%= time_ago_in_words(feed.created_at) %> ago</i>
+          </div>
+          <div><%= simple_format(feed.description) %></div>
+          <hr />
+        </li>
+        <% end %>
+      </ul>
+      <% unless @selected_task.id.nil? %>
+      <div style="width:100%;position:relative;">
+        <%= form_for(@new_feed) do |f| %>
+        <%= f.hidden_field :task_id, value: session[:selected_task_id] %>
+        <input type="hidden" name="type" value="comment" />
+        <%= f.hidden_field :user_id, value: current_user.id %>
+        <div class="field">
+          <%= f.text_area :description, style: 'width:100%' %>
+        </div>
+        <%= f.submit 'Comment', class: 'btn btn-sm btn-success btn-create-task', style: 'position:absolute;bottom:1px;right:1px;' %>
+        <% end %>
+      </div>
+      <% end %>
+    <% end %>
+  </div>
+</div>
+
+<% unless params[:group_id].nil? %>
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <%= form_for(@new_task) do |f| %>
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Create new task</h4>
+      </div>
+      <div class="modal-body">
+        <%= f.hidden_field :group_id, value: params[:group_id] %>
+        <div class="field" id="assign_datetime">
+          <%= f.collection_select :user_id, User.all, :id, :name,{:include_blank => "Unassigned"} %>
+          <%= f.text_field :due_at, class: 'datetimepicker' %>
+        </div>
+        <div class="field">
+          <label class="checkbox" for="task_completed1">
+            <%= f.check_box :completed, 'data-toggle' => 'checkbox', id: 'task_completed1' %>
+          </label>
+          <%= f.text_field :title, placeholder: "Task title" %>
+        </div>
+        <div class="field">
+          <%= f.text_area :description, placeholder: "Task Description" %>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <%= f.submit 'Create', class: 'btn btn-success' %>
+      </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+<% end %>
+
+<script type="text/javascript">
+  $(function(){
+    // on change redirect to that workspace
+    $('#workspace_id').on('change', function() {
+      $(this).prop('disabled',true);
+      location.href = '<%= root_url + current_user.id.to_s %>/' + this.value
+    });
+  });
+</script>

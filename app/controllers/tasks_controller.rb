@@ -50,12 +50,12 @@ class TasksController < ApplicationController
       if @task.save
         session[:selected_task_id] = @task.id
         unless @task.user_id.nil?
-          FeedMailer.assigned(@task.user.email,@task.description,@task.id,@task.group_id,current_user).deliver
+          FeedMailer.assigned(@task.user.email,@task.title,@task.description,@task.id,@task.group_id,current_user,session[:return_to]).deliver
         end
-        format.html { redirect_to root_url, notice: 'Task was successfully created.' }
+        format.html { redirect_to session[:return_to], notice: 'Task was successfully created.' }
         format.json { render json: @group, status: :created, location: @post }
       else
-        format.html { redirect_to root_url }
+        format.html { redirect_to session[:return_to] }
         format.json { render json: @group.errors, status: :unprocessable_entity }
       end
     end
@@ -77,12 +77,12 @@ class TasksController < ApplicationController
       if @task.update(pars)
         updated_user = @task.user_id
         if previous_user != updated_user && updated_user != nil
-          FeedMailer.assigned(@task.user.email,@task.description,@task.id,@task.group_id,current_user).deliver
+          FeedMailer.assigned(@task.user.email,@task.title,@task.description,@task.id,@task.group_id,current_user,session[:return_to]).deliver
         end
-        format.html { redirect_to root_url, notice: 'Task was successfully updated.' }
+        format.html { redirect_to session[:return_to], notice: 'Task was successfully updated.' }
         format.json { render json: @task, status: :created, location: @post }
       else
-        format.html { redirect_to root_url }
+        format.html { redirect_to session[:return_to] }
         format.json { render json: @task.errors, status: :unprocessable_entity }
       end
     end

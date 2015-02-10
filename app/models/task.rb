@@ -2,6 +2,7 @@ class Task < ActiveRecord::Base
   cattr_accessor :current_user
   has_many :feeds
   belongs_to :user
+  belongs_to :group
   after_create :create_feed
   after_update :update_feed
 

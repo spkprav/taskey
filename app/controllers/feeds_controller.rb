@@ -28,11 +28,11 @@ class FeedsController < ApplicationController
     respond_to do |format|
       if @feed.save
         if params[:type] == 'comment' && @feed.task.user != nil
-          FeedMailer.comment(@feed.task.user.email,@feed.task.title,@feed.description,@feed.task.id,@feed.task.group_id,current_user,@feed.task.user).deliver
+          FeedMailer.comment(@feed.task.user.email,@feed.task.user.name,@feed.task.title,@feed.description,@feed.task.id,@feed.task.group_id,current_user,@feed.task.user,session[:return_to]).deliver
         end
-        format.html { redirect_to root_url, notice: 'Feed was successfully created.' }
+        format.html { redirect_to session[:return_to], notice: 'Feed was successfully created.' }
       else
-        format.html { redirect_to root_url }
+        format.html { redirect_to session[:return_to] }
       end
     end
   end

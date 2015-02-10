@@ -23,6 +23,10 @@
    bottom:0;
    overflow-x: scroll;
  }
+ #workspace_id{
+   width: 100%;
+   padding: 4px;
+ }
  #left input{
    width: 100%;
    padding: 5px;

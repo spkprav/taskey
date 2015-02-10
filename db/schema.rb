@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150120141009) do
+ActiveRecord::Schema.define(version: 20150128170049) do
 
   create_table "feeds", force: true do |t|
     t.string   "title"
@@ -34,6 +34,7 @@ ActiveRecord::Schema.define(version: 20150120141009) do
   create_table "tasks", force: true do |t|
     t.string   "title"
     t.string   "description"
+    t.integer  "group_id",    default: 0
     t.boolean  "completed"
     t.integer  "user_id"
     t.datetime "due_at"
@@ -42,6 +43,7 @@ ActiveRecord::Schema.define(version: 20150120141009) do
   end
 
   create_table "users", force: true do |t|
+    t.string   "name"
     t.string   "email",                  default: "", null: false
     t.string   "encrypted_password",     default: "", null: false
     t.string   "reset_password_token"
@@ -58,5 +60,11 @@ ActiveRecord::Schema.define(version: 20150120141009) do
 
   add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
+
+  create_table "workspaces", force: true do |t|
+    t.string   "title"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
 end

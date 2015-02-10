@@ -27,10 +27,10 @@ class GroupsController < ApplicationController
 
     respond_to do |format|
       if @group.save
-        format.html { redirect_to root_url, notice: 'Group was successfully created.' }
+        format.html { redirect_to session[:return_to], notice: 'Group was successfully created.' }
         format.json { render json: @group, status: :created, location: @post }
       else
-        format.html { redirect_to root_url }
+        format.html { redirect_to session[:return_to] }
         format.json { render json: @group.errors, status: :unprocessable_entity }
       end
     end

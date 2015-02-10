@@ -7,7 +7,7 @@
   <div style="margin-bottom:10px;">Hello <%= @task_user.name %>,</div>
   <div><%= @comment %></div><br />
   <div style="margin-bottom:10px;">
-    <a href="<%= root_url + 'from_mail/' + @task_id.to_s + '/' + @group_id.to_s %>">Click here to view the task</a>
+    <a href="<%= @url %>">Click here to view the task</a>
   </div>
   <div>Thanks,</div>
   <div><%= @user.name.capitalize %></div>

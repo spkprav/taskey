@@ -1,5 +1,6 @@
 <div id="main">
   <div id="left">
+    <%= select_tag :workspace_id, options_from_collection_for_select(Workspace.all, :id, :title) %>
     <%= form_for(@group) do |f| %>
       <%= f.text_field :name, placeholder: 'Enter Group Name' %>
       <%= f.submit "Create Group", style: 'display:none;' %>
